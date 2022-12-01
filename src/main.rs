@@ -8,7 +8,7 @@ fn main() {
         Err(error) => panic!("Homma kusi {:?}", error)
     }; 
 
-    let split_new_line = contents.split("\n")
+    let split_new_line = contents.lines()
 
 
     println!("stuff \n {}", contents);
