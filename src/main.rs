@@ -7,9 +7,26 @@ fn main() {
         Ok(data) => data,
         Err(error) => panic!("Homma kusi {:?}", error)
     }; 
+    //rsplit?
+    let calories_by_person = contents.lines().fold(Vec::new(), |acc, curr| { 
+        let mut clone = acc.clone();
+        if clone.len() == 0 { 
+            clone.push(Vec::new());
+        }
+        if curr == "" {
+            clone.push(Vec::new());
+            return clone
+        }
 
-    let split_new_line = contents.lines()
+        clone.last_mut().unwrap().push(curr.parse::<i32>().unwrap());
+        return clone;
+    });
 
+    let summed_calories: Vec<i32> = calories_by_person.iter().map(|person_calories| { 
+        return person_calories.iter().sum()
+    }).collect();
 
-    println!("stuff \n {}", contents);
+    let highest_load_carried = summed_calories.iter().max().expect("???");
+
+    println!("result {}",highest_load_carried);
 }
