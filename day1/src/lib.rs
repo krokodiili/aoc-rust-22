@@ -1,5 +1,18 @@
 
-pub fn process_part1(contents: String) -> i32 {
+pub fn get_highest_calories_carried(contents: String) -> i32 {
+    let summed_calories = get_total_calories_list(contents);
+    return *summed_calories.iter().max().expect("???");
+}
+
+pub fn get_three_highest_calories_carried_total(contents: String) -> i32 { 
+    let mut summed_calories = get_total_calories_list(contents);
+    summed_calories.sort_by(|a,b | b.cmp(a));
+
+    let first_three = &summed_calories[0..3];
+    return first_three.iter().sum();
+}
+
+fn get_total_calories_list(contents: String) -> Vec<i32> {
     //rsplit?
     let calories_by_person = contents.lines().fold(Vec::new(), |acc, curr| { 
         let mut clone = acc.clone();
@@ -19,13 +32,44 @@ pub fn process_part1(contents: String) -> i32 {
         return person_calories.iter().sum()
     }).collect();
 
-    return *summed_calories.iter().max().expect("???");
+    return summed_calories;
 }
-// #[cfg(test)]
-// mod tests {
-//     #[test]
-//     fn it_works() {
-//         let result = 2 + 2;
-//         assert_eq!(result, 4);
-//     }
-// }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn part1_works() {
+        let stuff_to_parse = "
+1
+2
+3
+
+4
+5
+6
+
+7
+8
+9".to_string();
+        let result = get_highest_calories_carried(stuff_to_parse);
+        assert_eq!(result, 24);
+    }
+
+    #[test]
+    fn part2_works() {
+        let stuff_to_parse = "1
+2
+3
+
+4
+5
+
+6
+
+7
+8
+9".to_string();
+        let result = get_three_highest_calories_carried_total(stuff_to_parse);
+        assert_eq!(result, 39);
+}}

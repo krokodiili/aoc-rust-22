@@ -1,14 +1,11 @@
-use day1::process_part1;
+use day1::get_highest_calories_carried;
 use std::fs;
 
 fn main() { 
  let read_result = fs::read_to_string("input.txt");
 
-    let contents = match read_result {
-        Ok(data) => data,
-        Err(error) => panic!("Homma kusi {:?}", error)
-    }; 
+    let contents =read_result.unwrap(); 
 
-    let highest_load_carried = process_part1(contents);
+    let highest_load_carried = get_highest_calories_carried(contents);
     println!("result {}",highest_load_carried);
 }
