@@ -7,6 +7,7 @@ fn main() {
         Ok(data) => data,
         Err(error) => panic!("Homma kusi {:?}", error)
     }; 
+
     //rsplit?
     let calories_by_person = contents.lines().fold(Vec::new(), |acc, curr| { 
         let mut clone = acc.clone();
