@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use itertools::Itertools; 
 
 pub fn get_priority_sum_of_shared_items(sheet: String) -> i32 {
     return sheet.lines().fold(0, |acc, curr| {
@@ -12,6 +13,13 @@ pub fn get_priority_sum_of_shared_items(sheet: String) -> i32 {
         let score = give_score_to_char(shared_char);
         return acc + score;
     });
+}
+pub fn get_priority_sum_of_groups(sheet: String) -> i32 {
+ return sheet.lines().collect::<Vec<&str>>().chunks(3).fold(0, |acc, curr| {
+    //TODO:
+    let (a,b,c) = curr.into_iter().try_into();
+    return 42;
+ }); 
 }
 
 fn divide_rucksack(rucksack: &str) -> (&str, &str) {
