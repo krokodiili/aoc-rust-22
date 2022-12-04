@@ -1,14 +1,40 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+use std::collections::HashSet;
+
+pub fn get_priority_sum_of_shared_items(sheet: String) -> i32 {
+    return sheet.lines().fold(0, |acc, curr| {
+        let (compartment1, compartment2) = divide_rucksack(curr);
+        let compartment2_chars: HashSet<char> = compartment2.chars().collect();
+        let shared_char = compartment1
+            .chars()
+            .find(|char| return compartment2_chars.contains(char))
+            .unwrap();
+
+        let score = give_score_to_char(shared_char);
+        return acc + score;
+    });
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+fn divide_rucksack(rucksack: &str) -> (&str, &str) {
+    return rucksack.split_at(rucksack.len() / 2);
 }
+
+fn give_score_to_char(character: char) -> i32 {
+    let index_of_char = ('a'..='z')
+        .chain('A'..='Z')
+        .into_iter()
+        .position(|item| item == character)
+        .unwrap();
+
+    return index_of_char as i32 + 1;
+}
+
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+
+//     #[test]
+//     fn it_works() {
+//         let result = add(2, 2);
+//         assert_eq!(result, 4);
+//     }
+// }
