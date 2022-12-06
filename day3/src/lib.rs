@@ -1,5 +1,5 @@
+use itertools::Itertools;
 use std::collections::HashSet;
-use itertools::Itertools; 
 
 pub fn get_priority_sum_of_shared_items(sheet: String) -> i32 {
     return sheet.lines().fold(0, |acc, curr| {
@@ -15,11 +15,22 @@ pub fn get_priority_sum_of_shared_items(sheet: String) -> i32 {
     });
 }
 pub fn get_priority_sum_of_groups(sheet: String) -> i32 {
- return sheet.lines().collect::<Vec<&str>>().chunks(3).fold(0, |acc, curr| {
-    //TODO:
-    let (a,b,c) = curr.into_iter().try_into();
-    return 42;
- }); 
+    let group_sacks = sheet
+        .lines()
+        .collect::<Vec<&str>>()
+        .chunks(3)
+        .map(|group| {
+            let first_sack = group[0];
+            let priority = first_sack.chars().find(|char| {
+                let sack2_has_it = group[1].contains(*char);
+                let sack3_has_it = group[2].contains(*char);
+                return sack2_has_it && sack3_has_it;
+            });
+            return give_score_to_char(priority.unwrap());
+        })
+        .collect_vec();
+
+    return group_sacks.iter().sum();
 }
 
 fn divide_rucksack(rucksack: &str) -> (&str, &str) {
@@ -35,14 +46,3 @@ fn give_score_to_char(character: char) -> i32 {
 
     return index_of_char as i32 + 1;
 }
-
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-
-//     #[test]
-//     fn it_works() {
-//         let result = add(2, 2);
-//         assert_eq!(result, 4);
-//     }
-// }
