@@ -38,8 +38,13 @@ pub fn stacks_string_to_vectors(stacks: &str) -> Vec<Vec<char>> {
     return reversed;
 }
 
-fn execute_move(crate_stacks: Vec<Vec<char>>, command: String) -> Vec<Vec<char>> {
+fn execute_move(
+    crate_stacks: Vec<Vec<char>>,
+    command: String,
+    multilift_crane: Option<bool>,
+) -> Vec<Vec<char>> {
     let (amount, from, to) = parse_move(command);
+    let move_multi = multilift_crane.unwrap_or(false);
 
     let from_stack = crate_stacks[from as usize].clone();
     let mut to_stack = crate_stacks[to as usize].clone();
@@ -47,7 +52,12 @@ fn execute_move(crate_stacks: Vec<Vec<char>>, command: String) -> Vec<Vec<char>>
     let split_index = from_stack.len() as i32 - amount;
 
     let (remaining, to_move) = from_stack.split_at(split_index as usize);
-    to_move.iter().for_each(|item| to_stack.push(*item));
+
+    if move_multi {
+        to_stack.append(&mut to_move.to_vec());
+    } else {
+        to_move.iter().for_each(|item| to_stack.push(*item));
+    }
 
     let mut result = crate_stacks.clone();
     result[from as usize] = remaining.to_vec();
