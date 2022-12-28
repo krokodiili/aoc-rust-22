@@ -9,42 +9,39 @@ pub fn calculate_dir_sizes_from_cli_history(cli_history: &str) -> HashMap<String
     //TODO: any better way to manage state here?
     let mut checking_already_listed_folder = false;
     cli_history.lines().for_each(|line| {
+        println!("ll {:?}", folder_sizes);
         let is_command = line.contains("$");
+
         if is_command {
             if line.starts_with("$ cd") {
                 checking_already_listed_folder = false;
                 current_path = update_path_from_cd_string(line, &current_path);
             }
             if line.eq("$ ls") {
-                let current_dir = current_path.last().unwrap().clone();
-                if dirs_listed.contains(&current_dir) {
+                if dirs_listed.contains(&current_path.join("/")) {
                     checking_already_listed_folder = true;
                 } else {
-                    dirs_listed.push(current_dir);
+                    dirs_listed.push(current_path.join("/"));
                 }
             }
         } else {
-            if !line.contains("dir") && checking_already_listed_folder == false {
+            if !line.starts_with("dir") && checking_already_listed_folder == false {
                 let (size, _) = line.split_once(' ').unwrap();
-                current_path
-                    .iter()
-                    //TODO:
-                    .for_each(|dir| {
-                        folder_sizes
-                            .entry(dir.clone())
-                            .and_modify(|folder_size| *folder_size += size.parse::<i32>().unwrap())
-                            .or_insert(size.parse::<i32>().unwrap());
-                    });
+
+                let mut path_clone = current_path.clone();
+                while path_clone.len() > 0 {
+                    // Create the full length paths so duplicate dirnames work and increment. Could
+                    // have used some cleaner tree based solution here.
+                    folder_sizes
+                        .entry(path_clone.join("/"))
+                        .and_modify(|folder_size| *folder_size += size.parse::<i32>().unwrap())
+                        .or_insert(size.parse::<i32>().unwrap());
+                    path_clone.pop();
+                }
+            } else {
             }
         }
-        //println!("oohohohoi {}", line);
-
-        //println!("sizes {:?}", folder_sizes);
-
-        //println!("jeahboi {:?}", current_path);
     });
-
-    //println!("hohohoajsdfjasdf {:?}", folder_sizes);
     return folder_sizes;
 }
 
@@ -83,6 +80,11 @@ $ cd e
 $ ls
 584 i
 $ cd ..
+$ ls
+dir e
+29116 f
+2557 g
+62596 h.lst
 $ cd ..
 $ cd d
 $ ls
