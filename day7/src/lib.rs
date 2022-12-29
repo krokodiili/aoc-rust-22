@@ -9,7 +9,6 @@ pub fn calculate_dir_sizes_from_cli_history(cli_history: &str) -> HashMap<String
     //TODO: any better way to manage state here?
     let mut checking_already_listed_folder = false;
     cli_history.lines().for_each(|line| {
-        println!("ll {:?}", folder_sizes);
         let is_command = line.contains("$");
 
         if is_command {
@@ -29,9 +28,10 @@ pub fn calculate_dir_sizes_from_cli_history(cli_history: &str) -> HashMap<String
                 let (size, _) = line.split_once(' ').unwrap();
 
                 let mut path_clone = current_path.clone();
+
                 while path_clone.len() > 0 {
                     // Create the full length paths so duplicate dirnames work and increment. Could
-                    // have used some cleaner tree based solution here.
+                    // have used some cleaner tree based solution.
                     folder_sizes
                         .entry(path_clone.join("/"))
                         .and_modify(|folder_size| *folder_size += size.parse::<i32>().unwrap())
@@ -57,13 +57,19 @@ fn update_path_from_cd_string(cd_string: &str, current_path: &Vec<String>) -> Ve
     return updated_path;
 }
 
+pub fn closest_to_minimum(minimum: i32, numbers: &Vec<i32>) -> i32 {
+    let mut ordered = numbers.clone();
+    ordered.sort();
+    let result = ordered.iter().find(|num| **num >= minimum).unwrap().clone();
+    return result;
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn it_calculates_dir_sizes() {
-        println!("???");
         let lines = "$ cd /
 $ ls
 dir a
@@ -94,13 +100,32 @@ $ ls
 7214296 k";
         let result = calculate_dir_sizes_from_cli_history(lines);
 
-        let expected_result =
-            HashMap::from([("e", 584), ("a", 94853), ("d", 24933642), ("/", 48381165)]);
+        let expected_result = HashMap::from([
+            ("//a", 94853),
+            ("//a/e", 584),
+            ("//d", 24933642),
+            ("/", 48381165),
+        ]);
         let keys_match = expected_result.len() == result.len()
             && expected_result
                 .keys()
                 .all(|k| result.contains_key(*k) && expected_result.get(k) == result.get(*k));
 
         assert_eq!(keys_match, true);
+    }
+
+    #[test]
+    fn it_finds_the_directory_closest_to_minimum() {
+        let dir_sizes = vec![30980, 12345, 777, 8888];
+
+        let result1 = closest_to_minimum(4000, &dir_sizes);
+
+        assert_eq!(result1, 8888);
+
+        let result2 = closest_to_minimum(700, &dir_sizes);
+        assert_eq!(result2, 777);
+
+        let result3 = closest_to_minimum(12346, &dir_sizes);
+        assert_eq!(result3, 30980);
     }
 }
